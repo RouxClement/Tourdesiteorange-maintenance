@@ -133,10 +133,15 @@
     
     .ronde-detail { display: none; border-top: 1px solid #EDE6DC; background: #FAF8F5;}
     .ronde-detail.open { display: block; }
-    .detail-item { padding: 12px 16px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+    .detail-item { padding: 12px 16px; border-bottom: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 8px; }
+    .detail-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; width: 100%; }
     .detail-left { flex: 1; }
     .detail-point { font-size: 14px; color: var(--text-main); font-weight: 600; }
     .detail-note { font-size: 13px; color: #1A1410; margin-top: 6px; background: #FFFFFF; padding: 8px 10px; border-radius: 6px; border: 1px solid #E8E0D4; display: flex; gap: 6px; align-items: flex-start;}
+
+    /* Bouton Marquer Fait */
+    .btn-done-task { margin-top: 4px; padding: 8px 12px; border: none; border-radius: 8px; background: #EAF5EE; color: #1A6B3C; font-weight: 600; font-size: 12px; cursor: pointer; border: 1px solid #A3D4B5; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s; font-family: inherit; }
+    .btn-done-task:active { transform: scale(0.96); background: #D1E8DB; }
 
     /* Helpers */
     .empty-state { text-align: center; padding: 60px 20px; }
@@ -273,7 +278,7 @@ let state = {prenom:"", answers:{}, ts:null};
 let lastEntries = [];
 let allRondes = [];
 let curYear = "all";
-let curMonth = "all"; // Variable pour le filtre du mois
+let curMonth = "all"; 
 
 function show(id) {
   document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
@@ -323,6 +328,48 @@ async function saveRonde(obj) {
   } catch(e) {
     console.error("Erreur de sauvegarde", e);
     alert("Le rapport est sauvegardé sur ce téléphone, mais la transmission au serveur a échoué. Vérifiez la connexion internet.");
+  }
+}
+
+// ==========================================
+// NOUVEAUTÉ : MARQUER COMME FAIT (RÉSEAU)
+// ==========================================
+async function marquerFaitEnReseau(rondeId, pointIndex) {
+  if (!confirm("Marquer cette tâche comme FAITE et mettre à jour le fichier Excel en réseau ?")) return;
+  
+  const ronde = allRondes.find(r => r.id === rondeId);
+  if (!ronde) return;
+  
+  const entree = ronde.entries[pointIndex];
+  // On ajoute la date de réparation à la note existante
+  const suffixe = "(Réparé le " + new Date().toLocaleDateString("fr-FR") + ")";
+  const nouvelleNote = entree.note ? entree.note + " - " + suffixe : suffixe;
+  
+  try {
+    // On envoie la mise à jour à Google Sheets
+    await fetch(GOOGLE_SCRIPT_URL, {
+      method: "POST",
+      mode: "no-cors", // On garde no-cors pour correspondre à ton système actuel
+      body: JSON.stringify({
+        action: "update",
+        date: ronde.date,
+        prenom: ronde.prenom,
+        point: entree.point,
+        note: nouvelleNote
+      }),
+      headers: { "Content-Type": "text/plain;charset=utf-8" }
+    });
+    
+    // On met à jour l'affichage sur le téléphone tout de suite
+    entree.etat = "ras";
+    entree.note = nouvelleNote;
+    await storageAdapter.set("ronde3:" + ronde.id, JSON.stringify(ronde));
+    
+    renderSuivi(); 
+    alert("Tâche marquée comme FAITE et Excel mis à jour !");
+    
+  } catch (error) {
+    alert("Erreur réseau. Impossible de joindre Excel (Vérifie ta connexion internet).");
   }
 }
 
@@ -422,7 +469,7 @@ async function finishTour() {
 async function openSuivi() {
   show("s-suivi");
   curYear = "all";
-  curMonth = "all"; // Remise à zéro au chargement
+  curMonth = "all"; 
   document.getElementById("rondes-list").innerHTML = '<div class="empty-state"><i class="ti ti-loader" style="animation: spin 1s linear infinite" aria-hidden="true"></i><p>Chargement…</p></div>';
   await loadAll();
   buildYearTabs();
@@ -438,7 +485,6 @@ function buildYearTabs() {
     + years.map(y => '<button class="year-tab" onclick="setYear(\''+y+'\',this)">'+y+'</button>').join("");
 }
 
-// Nouvelle barre pour filtrer par mois
 function buildMonthTabs() {
   const tabs = document.getElementById("month-tabs");
   if (!tabs) return;
@@ -457,10 +503,10 @@ function buildMonthTabs() {
 
 function setYear(y, btn) {
   curYear = y;
-  curMonth = "all"; // On réinitialise le mois choisi pour éviter les listes vides
+  curMonth = "all"; 
   document.querySelectorAll("#year-tabs .year-tab").forEach(b => b.classList.remove("active"));
   btn.classList.add("active");
-  buildMonthTabs(); // On rafraîchit l'affichage des mois
+  buildMonthTabs(); 
   renderSuivi();
 }
 
@@ -478,10 +524,10 @@ function renderSuivi() {
   // 1. Filtrage par année
   if(curYear !== "all") data = data.filter(r => (r.year || new Date(r.ts).getFullYear().toString()) === curYear);
   
-  // 2. Filtrage par mois (recherche le morceau /MM/ dans la date de l'appli)
+  // 2. Filtrage par mois (Corrigé pour correspondre au bon format "17/06/2026")
   if(curMonth !== "all") {
     data = data.filter(r => {
-      const match = r.date.match(/le \d{2}\/(\d{2})\//);
+      const match = r.date.match(/^\d{2}\/(\d{2})\/\d{4}/);
       return match && match[1] === curMonth;
     });
   }
@@ -513,15 +559,27 @@ function renderSuivi() {
       
     const detail = document.createElement("div"); detail.className = "ronde-detail";
     
-    let rows = ronde.entries.map(e => {
+    let rows = ronde.entries.map((e, idx) => {
       const bc = e.etat==="ras" ? "b-ok" : e.etat==="passage" ? "b-warn" : "";
       const bl = e.etat==="ras" ? "RAS" : e.etat==="passage" ? "Passage demandé" : "Ignoré";
+      
+      // AJOUT DU BOUTON MARQUER FAIT ICI
+      let actionBtn = "";
+      if(e.etat === "passage") {
+        actionBtn = `<button class="btn-done-task" onclick="marquerFaitEnReseau('${ronde.id}', ${idx})">
+                       <i class="ti ti-check" style="font-size:16px;"></i> Marquer FAIT
+                     </button>`;
+      }
+
       return '<div class="detail-item">'
-        + '<div class="detail-left">'
-        + '<div class="detail-point">' + e.point + '</div>'
-        + (e.note ? '<div class="detail-note"><i class="ti ti-messages" style="color:#C4A882; font-size:16px;"></i><span style="flex:1">' + e.note + '</span></div>' : '')
+        + '<div class="detail-top">'
+        +   '<div class="detail-left">'
+        +     '<div class="detail-point">' + e.point + '</div>'
+        +     (e.note ? '<div class="detail-note"><i class="ti ti-messages" style="color:#C4A882; font-size:16px;"></i><span style="flex:1">' + e.note + '</span></div>' : '')
+        +   '</div>'
+        +   '<span class="badge ' + bc + '" style="flex-shrink:0;">' + bl + '</span>'
         + '</div>'
-        + '<span class="badge ' + bc + '" style="margin-left:8px; flex-shrink:0;">' + bl + '</span>'
+        + actionBtn
         + '</div>';
     }).join("");
     
@@ -560,7 +618,7 @@ async function exportAllExcel() {
   if(curYear !== "all") data = data.filter(r => (r.year || new Date(r.ts).getFullYear().toString()) === curYear);
   if(curMonth !== "all") {
     data = data.filter(r => {
-      const match = r.date.match(/le \d{2}\/(\d{2})\//);
+      const match = r.date.match(/^\d{2}\/(\d{2})\/\d{4}/);
       return match && match[1] === curMonth;
     });
   }
