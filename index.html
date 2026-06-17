@@ -29,22 +29,23 @@
       justify-content: center;
       align-items: flex-start;
       min-height: 100vh;
+      padding: 0;
     }
 
+    /* Adaptation Desktop / Mobile */
     .app {
       width: 100%;
-      max-width: 420px;
-      background: var(--app-bg);
+      max-width: 420px; /* Taille optimale pour un affichage "mobile" sur PC */
+      background: var(--bg-color);
       min-height: 100vh;
       position: relative;
-      display: flex;
-      flex-direction: column;
+      box-shadow: none;
     }
 
     @media (min-width: 480px) {
       body { padding: 40px 20px; }
       .app {
-        min-height: 850px;
+        min-height: 800px;
         border-radius: 24px;
         overflow: hidden;
         box-shadow: 0 20px 40px rgba(30, 18, 8, 0.08);
@@ -52,15 +53,17 @@
       }
     }
 
-    .screen { display: none; flex-direction: column; height: 100%; animation: fadeIn 0.3s ease; flex: 1; }
-    .screen.active { display: flex; }
+    .screen { display: none; height: 100%; animation: fadeIn 0.3s ease; }
+    .screen.active { display: block; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
     /* Topbar */
-    .topbar { background: var(--primary); padding: 16px 20px; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 50;}
+    .topbar { background: var(--primary); padding: 16px 20px; display: flex; align-items: center; gap: 12px; }
     .topbar-back { width: 36px; height: 36px; border-radius: 50%; background: rgba(196,168,130,0.12); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--accent); font-size: 18px; flex-shrink: 0; transition: background 0.2s;}
+    .topbar-back:hover { background: rgba(196,168,130,0.25); }
     .topbar-title { font-size: 16px; font-weight: 600; color: #F5EFE6; flex: 1; }
     .topbar-sub { font-size: 12px; color: #9C8A70; margin-top: 2px; }
+    .topbar-right { color: var(--accent); font-size: 14px; font-weight: 600; }
 
     /* Accueil */
     .welcome-hero { background: var(--primary); padding: 40px 20px 30px; text-align: center; border-bottom-left-radius: 20px; border-bottom-right-radius: 20px;}
@@ -68,57 +71,80 @@
     .arch-icon i { font-size: 32px; color: var(--accent); }
     .welcome-title { font-size: 22px; font-weight: 600; color: #F5EFE6; }
     .welcome-sub { font-size: 13px; color: #9C8A70; margin-top: 6px; text-transform: uppercase; letter-spacing: 0.05em;}
+    .welcome-line { width: 40px; height: 3px; background: var(--accent); border-radius: 2px; margin: 16px auto 0; }
 
-    .welcome-body { padding: 24px 20px; background: var(--bg-color); flex: 1;}
+    .welcome-body { padding: 24px 20px; }
     .card { background: var(--app-bg); border: 1px solid var(--border-color); border-radius: 16px; padding: 24px; margin-bottom: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.02); }
     .card-title { font-size: 16px; font-weight: 600; color: var(--text-main); margin-bottom: 6px; }
     .card-sub { font-size: 14px; color: var(--text-muted); line-height: 1.5; margin-bottom: 20px; }
     .field-label { font-size: 12px; font-weight: 600; text-transform: uppercase; color: #9C8A70; display: block; margin-bottom: 8px; }
-    .big-input { width: 100%; font-size: 15px; padding: 14px; border: 1px solid var(--border-color); border-radius: 12px; background: #FAF8F5; color: var(--text-main); outline: none; transition: all 0.2s; font-family: inherit;}
+    .big-input { width: 100%; font-size: 16px; padding: 16px; border: 1px solid var(--border-color); border-radius: 12px; background: #FAF8F5; color: var(--text-main); outline: none; transition: all 0.2s; font-family: inherit;}
     .big-input:focus { border-color: var(--accent); background: #FFF; box-shadow: 0 0 0 3px rgba(196,168,130,0.1); }
 
     /* Boutons */
-    .btn-main { width: 100%; padding: 16px; background: var(--primary); color: #F5EFE6; border: none; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; transition: transform 0.1s, background 0.2s; margin-top: 10px; font-family: inherit;}
+    .btn-main { width: 100%; padding: 16px; background: var(--primary); color: #F5EFE6; border: none; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; transition: transform 0.1s, background 0.2s; margin-top: 20px; font-family: inherit;}
     .btn-main:active { transform: scale(0.98); background: #2D1C0C; }
     .btn-outline { width: 100%; padding: 16px; background: transparent; color: #5C4A30; border: 1px solid #DDD5C5; border-radius: 12px; font-size: 15px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; transition: all 0.2s; font-family: inherit;}
     .btn-outline:active { background: #E8E0D4; }
 
-    /* Checklist Ronde */
-    .checklist-body { padding: 16px 20px 40px; background: var(--bg-color); flex: 1; overflow-y: auto; }
-    .check-card { background: var(--app-bg); border: 1px solid var(--border-color); border-radius: 16px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.02); }
-    .check-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
-    .check-icon { width: 36px; height: 36px; background: #FAF8F5; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 18px; flex-shrink: 0;}
-    .check-title { font-size: 15px; font-weight: 600; color: var(--text-main); }
+    /* Barre de progression */
+    .prog-bar-wrap { background: var(--primary); padding: 0 20px 16px; }
+    .prog-track { background: rgba(196,168,130,0.15); height: 6px; border-radius: 3px; overflow: hidden; }
+    .prog-fill { height: 100%; background: var(--accent); border-radius: 3px; transition: width 0.4s ease-out; }
+    .prog-dots { display: flex; justify-content: space-between; margin-top: 10px; padding: 0 2px;}
+    .pdot { width: 8px; height: 8px; border-radius: 50%; background: rgba(196,168,130,0.2); transition: all 0.3s; }
+    .pdot.done { background: var(--accent); }
+    .pdot.current { background: #F5EFE6; transform: scale(1.3); }
+
+    /* Liste des points de contrôle */
+    .lieu-header { background: #FAF8F5; border-bottom: 1px solid var(--border-color); padding: 20px; display: flex; align-items: center; gap: 16px; }
+    .lieu-ico { width: 48px; height: 48px; background: var(--primary); border-radius: 14px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 4px 10px rgba(30,18,8,0.1);}
+    .lieu-ico i { font-size: 24px; color: var(--accent); }
+    .lieu-hname { font-size: 18px; font-weight: 600; color: var(--text-main); }
+    .lieu-hdesc { font-size: 13px; color: #9C8A70; margin-top: 4px; }
+
+    .lieu-body { padding: 20px; background: var(--app-bg); }
+    .chk-item { margin-bottom: 24px; }
+    .chk-label { font-size: 15px; font-weight: 600; color: var(--text-main); margin-bottom: 4px; }
+    .chk-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 12px; }
     
-    .status-btns { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 10px; }
-    .sbtn { padding: 12px 4px; border-radius: 10px; border: 1px solid var(--border-color); background: #FAF8F5; cursor: pointer; text-align: center; transition: all 0.15s; font-family: inherit; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;}
-    .sbtn i { font-size: 20px; color: #9C8A70; }
+    .status-btns { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .sbtn { padding: 14px 4px; border-radius: 12px; border: 1px solid var(--border-color); background: #FAF8F5; cursor: pointer; text-align: center; transition: all 0.15s; font-family: inherit;}
+    .sbtn i { display: block; font-size: 22px; color: #9C8A70; margin-bottom: 6px; }
     .sbtn span { font-size: 12px; font-weight: 600; color: var(--text-muted); }
     
     .sbtn.ok { background: #EAF5EE; border-color: #A3D4B5; box-shadow: 0 2px 8px rgba(26,107,60,0.1);}
     .sbtn.ok i, .sbtn.ok span { color: #1A6B3C; }
     .sbtn.warn { background: #FEF6E4; border-color: #F0C060; box-shadow: 0 2px 8px rgba(138,94,0,0.1);}
     .sbtn.warn i, .sbtn.warn span { color: #8A5E00; }
+    .sbtn.bad { background: #FDECEA; border-color: #F5B7B1; box-shadow: 0 2px 8px rgba(181,42,28,0.1);}
+    .sbtn.bad i, .sbtn.bad span { color: #B52A1C; }
 
-    .check-note { width: 100%; font-size: 13px; padding: 10px 12px; border: 1px dashed #DDD5C5; border-radius: 8px; background: transparent; color: var(--text-main); outline: none; transition: all 0.2s; font-family: inherit;}
-    .check-note:focus { border: 1px solid var(--accent); background: #FFF; }
+    .note-wrap { margin-top: 16px; padding-top: 20px; border-top: 1px solid var(--border-color); }
+    .note-wrap label { font-size: 12px; font-weight: 600; text-transform: uppercase; color: #9C8A70; display: flex; align-items: center; gap: 6px; margin-bottom: 10px; }
+    .note-wrap textarea { width: 100%; font-size: 15px; padding: 14px; border: 1px solid var(--border-color); border-radius: 12px; background: #FAF8F5; color: var(--text-main); resize: none; height: 80px; line-height: 1.5; outline: none; transition: border-color 0.2s; font-family: inherit;}
+    .note-wrap textarea:focus { border-color: var(--accent); background: #FFF;}
+
+    .nav-row { display: grid; grid-template-columns: 1fr 2fr; gap: 12px; padding: 20px; background: var(--bg-color); border-top: 1px solid var(--border-color);}
+    .btn-prev { padding: 16px; background: var(--app-bg); color: #5C4A30; border: 1px solid #DDD5C5; border-radius: 12px; font-size: 15px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.2s; }
+    .btn-next { padding: 16px; background: var(--primary); color: #F5EFE6; border: none; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: transform 0.1s; }
+    .btn-next:active { transform: scale(0.98); }
 
     /* Écran Fin */
     .done-hero { background: var(--primary); padding: 50px 20px 30px; text-align: center; }
     .done-circle { width: 80px; height: 80px; background: rgba(45,122,79,0.15); border: 3px solid #5BBF85; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; }
     .done-circle i { font-size: 36px; color: #2D7A4F; }
     .done-title { font-size: 24px; font-weight: 600; color: #F5EFE6; }
-    
-    .stats-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 20px; background: var(--bg-color); }
+    .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding: 20px; }
     .stat { background: var(--app-bg); border: 1px solid var(--border-color); border-radius: 16px; padding: 16px 8px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.02);}
     .stat-n { font-size: 28px; font-weight: 600; }
-    .stat-l { font-size: 13px; color: #9C8A70; margin-top: 4px; font-weight: 500;}
+    .stat-l { font-size: 12px; color: #9C8A70; margin-top: 4px; font-weight: 500;}
 
     /* Listes & Historique */
-    .suivi-body { padding: 16px 20px 30px; background: var(--bg-color); flex: 1; overflow-y: auto;}
+    .suivi-body { padding: 16px 20px 30px; }
     .year-tabs { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 16px; scrollbar-width: none; }
     .year-tabs::-webkit-scrollbar { display: none; }
-    .year-tab { padding: 10px 20px; border-radius: 24px; border: 1px solid #DDD5C5; background: var(--app-bg); font-size: 14px; font-weight: 600; color: var(--text-muted); cursor: pointer; white-space: nowrap; transition: all 0.2s;}
+    .year-tab { padding: 10px 20px; border-radius: 24px; border: 1px solid #DDD5C5; background: var(--app-bg); font-size: 14px; font-weight: 600; color: var(--text-muted); cursor: pointer; white-space: nowrap; transition: all 0.2s; font-family: inherit;}
     .year-tab.active { background: var(--primary); color: #F5EFE6; border-color: var(--primary); }
     
     .ronde-card { background: var(--app-bg); border: 1px solid var(--border-color); border-radius: 16px; margin-bottom: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.02);}
@@ -130,19 +156,21 @@
     .badge { font-size: 12px; padding: 4px 10px; border-radius: 12px; font-weight: 600; }
     .b-ok { background: #EAF5EE; color: #1A6B3C; }
     .b-warn { background: #FEF6E4; color: #8A5E00; }
+    .b-bad { background: #FDECEA; color: #B52A1C; }
     
     .ronde-detail { display: none; border-top: 1px solid #EDE6DC; background: #FAF8F5;}
     .ronde-detail.open { display: block; }
-    .detail-item { padding: 12px 16px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+    .detail-item { padding: 14px 16px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; gap: 12px; }
     .detail-left { flex: 1; }
-    .detail-point { font-size: 14px; color: var(--text-main); font-weight: 600; }
-    .detail-note { font-size: 13px; color: #1A1410; margin-top: 6px; background: #FFFFFF; padding: 8px 10px; border-radius: 6px; border: 1px solid #E8E0D4; display: flex; gap: 6px; align-items: flex-start;}
+    .detail-lieu { font-size: 12px; color: #9C8A70; font-weight: 600; text-transform: uppercase; }
+    .detail-point { font-size: 14px; color: var(--text-main); font-weight: 500; margin-top: 2px; }
+    .detail-note { font-size: 13px; color: #9C8A70; margin-top: 4px; background: rgba(0,0,0,0.03); padding: 8px; border-radius: 8px;}
 
     /* Helpers */
     .empty-state { text-align: center; padding: 60px 20px; }
     .empty-state i { font-size: 48px; color: #C8BFB0; display: block; margin-bottom: 16px; }
     .empty-state p { font-size: 15px; color: var(--text-muted); font-weight: 500;}
-    .saving-wrap { text-align: center; padding: 80px 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; background: var(--bg-color); flex: 1;}
+    .saving-wrap { text-align: center; padding: 80px 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%;}
     .saving-wrap i { font-size: 56px; color: var(--accent); display: block; margin-bottom: 20px; animation: pulse 1.5s infinite;}
     @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.1); opacity: 0.7; } 100% { transform: scale(1); opacity: 1; } }
   </style>
@@ -151,71 +179,90 @@
 
 <div class="app">
 
-  <!-- ACCUEIL -->
   <div id="s-welcome" class="screen active">
     <div class="welcome-hero">
       <div class="arch-icon"><i class="ti ti-building-arch" aria-hidden="true"></i></div>
       <div class="welcome-title">Théâtre Antique d'Orange</div>
       <div class="welcome-sub">Maintenance & Sécurité</div>
+      <div class="welcome-line"></div>
     </div>
     <div class="welcome-body">
       <div class="card">
         <div class="card-title">Nouvelle inspection</div>
-        <div class="card-sub">Veuillez renseigner votre prénom pour accéder à la checklist de contrôle.</div>
+        <div class="card-sub">Veuillez renseigner votre prénom pour débuter le parcours de vérification du site.</div>
         <label class="field-label" for="prenom">Identifiant agent</label>
         <input class="big-input" type="text" id="prenom" placeholder="Ex : Clément" autocomplete="given-name" />
         <button class="btn-main" onclick="startTour()">
-          <i class="ti ti-list-check" aria-hidden="true"></i> Ouvrir la checklist
+          <i class="ti ti-player-play" aria-hidden="true"></i> Démarrer la ronde
         </button>
       </div>
       <button class="btn-outline" onclick="openSuivi()">
-        <i class="ti ti-clipboard-list" aria-hidden="true"></i> Historique des contrôles
+        <i class="ti ti-clipboard-list" aria-hidden="true"></i> Consulter l'historique
       </button>
     </div>
   </div>
 
-  <!-- CHECKLIST EN COURS -->
   <div id="s-tour" class="screen">
     <div class="topbar">
-      <button class="topbar-back" onclick="resetTour()" aria-label="Retour"><i class="ti ti-x" aria-hidden="true"></i></button>
       <div>
-        <div class="topbar-title">Checklist de ronde</div>
-        <div class="topbar-sub" id="tour-user-lbl">Agent en cours</div>
+        <div class="topbar-title">Théâtre Antique d'Orange</div>
+        <div class="topbar-sub" id="tour-user-lbl">Ronde en cours</div>
+      </div>
+      <div style="flex:1"></div>
+      <div class="topbar-right" id="step-badge">1 / 6</div>
+    </div>
+    <div class="prog-bar-wrap">
+      <div class="prog-track"><div class="prog-fill" id="prog-fill" style="width:16%"></div></div>
+      <div class="prog-dots" id="prog-dots"></div>
+    </div>
+    <div id="lieu-wrap">
+      <div class="lieu-header">
+        <div class="lieu-ico"><i id="lieu-ic" class="ti ti-map-pin" aria-hidden="true"></i></div>
+        <div>
+          <div class="lieu-hname" id="lieu-name">Chargement...</div>
+          <div class="lieu-hdesc" id="lieu-desc"></div>
+        </div>
+      </div>
+      <div class="lieu-body">
+        <div id="checks-cont"></div>
+        <div class="note-wrap">
+          <label><i class="ti ti-notes" style="font-size:16px" aria-hidden="true"></i> Observations annexes</label>
+          <textarea id="note-field" placeholder="Problème spécifique, matériel manquant, éclairage défectueux..."></textarea>
+        </div>
       </div>
     </div>
-    
-    <div class="checklist-body" id="checklist-cont">
-      <!-- Les points de contrôle s'afficheront ici -->
+    <div class="nav-row">
+      <button class="btn-prev" id="btn-prev" onclick="prevLieu()"><i class="ti ti-arrow-left" aria-hidden="true"></i></button>
+      <button class="btn-next" id="btn-next" onclick="nextLieu()">Suivant <i class="ti ti-arrow-right" aria-hidden="true"></i></button>
     </div>
   </div>
 
-  <!-- CHARGEMENT -->
   <div id="s-saving" class="screen">
     <div class="saving-wrap">
       <i class="ti ti-cloud-upload" aria-hidden="true"></i>
-      <h2 style="font-size: 18px; color: var(--text-main);">Transmission en cours...</h2>
-      <p style="color: var(--text-muted); margin-top: 8px;">Enregistrement dans la base de données.</p>
+      <h2 style="font-size: 18px; color: var(--text-main);">Génération du rapport...</h2>
+      <p style="color: var(--text-muted); margin-top: 8px;">Enregistrement des données de la ronde.</p>
     </div>
   </div>
 
-  <!-- FIN DE RONDE -->
   <div id="s-done" class="screen">
     <div class="done-hero">
       <div class="done-circle"><i class="ti ti-check" aria-hidden="true"></i></div>
-      <div class="done-title">Contrôle transmis !</div>
+      <div class="done-title">Inspection terminée</div>
       <div class="topbar-sub" id="done-sub" style="color: #C4A882; margin-top: 8px;">...</div>
     </div>
     <div class="stats-row">
-      <div class="stat"><div class="stat-n" id="s-ok" style="color:#1A6B3C">0</div><div class="stat-l">Zones RAS</div></div>
-      <div class="stat"><div class="stat-n" id="s-warn" style="color:#8A5E00">0</div><div class="stat-l">Passages demandés</div></div>
+      <div class="stat"><div class="stat-n" id="s-ok" style="color:#1A6B3C">0</div><div class="stat-l">Opérationnel</div></div>
+      <div class="stat"><div class="stat-n" id="s-warn" style="color:#8A5E00">0</div><div class="stat-l">À surveiller</div></div>
+      <div class="stat"><div class="stat-n" id="s-bad" style="color:#B52A1C">0</div><div class="stat-l">À traiter</div></div>
     </div>
-    <div style="padding: 20px; display: flex; flex-direction: column; gap: 12px; background: var(--bg-color); flex: 1;">
-      <button class="btn-main" onclick="openSuivi()"><i class="ti ti-clipboard-list" aria-hidden="true"></i> Consulter l'historique</button>
+    <div style="padding: 0 20px 30px; display: flex; flex-direction: column; gap: 12px;">
+      <button class="btn-main" onclick="openSuivi()"><i class="ti ti-clipboard-list" aria-hidden="true"></i> Historique des rondes</button>
+      <button class="btn-outline" onclick="exportExcel(lastEntries)"><i class="ti ti-file-spreadsheet" aria-hidden="true"></i> Exporter ce rapport (Excel)</button>
       <button class="btn-outline" onclick="resetTour()"><i class="ti ti-home" aria-hidden="true"></i> Retour à l'accueil</button>
     </div>
   </div>
 
-  <!-- SUIVI / HISTORIQUE -->
   <div id="s-suivi" class="screen">
     <div class="topbar">
       <button class="topbar-back" onclick="show('s-welcome')" aria-label="Retour"><i class="ti ti-arrow-left" aria-hidden="true"></i></button>
@@ -223,7 +270,7 @@
         <div class="topbar-title">Historique</div>
         <div class="topbar-sub" id="suivi-sub">Chargement…</div>
       </div>
-      <button class="topbar-back" onclick="exportAllExcel()" title="Exporter Excel"><i class="ti ti-download" aria-hidden="true" style="font-size:18px;"></i></button>
+      <button class="topbar-back" onclick="exportAllExcel()" aria-label="Exporter tout" title="Tout exporter en Excel"><i class="ti ti-download" aria-hidden="true" style="font-size:18px;"></i></button>
     </div>
     <div class="suivi-body">
       <div class="year-tabs" id="year-tabs"></div>
@@ -234,7 +281,7 @@
 </div>
 
 <script>
-// LocalStorage simulant la base
+// Base de données simulée pour GitHub Pages (utilise LocalStorage en réalité)
 const storageAdapter = {
   async list(prefix) {
     const keys = [];
@@ -248,30 +295,46 @@ const storageAdapter = {
   async set(key, value) { localStorage.setItem(key, value); }
 };
 
-// La liste exacte demandée par la maintenance
-const POINTS_CONTROLE = [
-  { id: "wc", label: "WC / Sanitaires", icon: "ti-bath" },
-  { id: "temple", label: "Temple", icon: "ti-building-monument" },
-  { id: "orchestra", label: "Orchestra", icon: "ti-music" },
-  { id: "terrasse_bout", label: "Terrasse Boutique", icon: "ti-shopping-cart" },
-  { id: "couloirs", label: "Les 2 couloirs (Boissons & face)", icon: "ti-arrows-split" },
-  { id: "grottes", label: "Grottes", icon: "ti-mountain" },
-  { id: "circ_inf", label: "Circulation inférieure", icon: "ti-arrow-down-circle" },
-  { id: "circ_sup", label: "Circulation supérieure", icon: "ti-arrow-up-circle" },
-  { id: "gradins", label: "Gradins", icon: "ti-stairs" },
-  { id: "panoramique", label: "Vue panoramique", icon: "ti-panorama-horizontal" },
-  { id: "terrasse_1", label: "Terrasse 1er étage", icon: "ti-layers-intersect" },
-  { id: "terrasse_2", label: "Terrasse 2ème étage", icon: "ti-layers-intersect-2" },
-  { id: "entree", label: "Entrée principale", icon: "ti-door-enter" },
-  { id: "escaliers", label: "Escaliers", icon: "ti-stairs-up" }
+const LIEUX = [
+  {id:"scene", icon:"ti-microphone", name:"Scène principale", desc:"Plancher, éclairage, accès", checks:[
+    {id:"plancher", label:"Plancher de scène", sub:"État des planches, fixations"},
+    {id:"acces", label:"Accès scène", sub:"Escaliers, rampes, dégagement"},
+    {id:"eclairage", label:"Structures & Éclairage", sub:"Projecteurs, câblages visibles"},
+  ]},
+  {id:"cavea", icon:"ti-stairs", name:"Cavea — gradins", desc:"Gradins pierre, allées, propreté", checks:[
+    {id:"gradins", label:"Gradins en pierre", sub:"Fissures, pierres descellées"},
+    {id:"allees", label:"Circulation", sub:"Allées dégagées, sol stable"},
+    {id:"proprete", label:"Propreté générale", sub:"Absence de déchets, végétation"},
+  ]},
+  {id:"mur", icon:"ti-building-monument", name:"Mur de scène", desc:"Frons scaenae, mur classé", checks:[
+    {id:"maco", label:"Maçonnerie", sub:"Surveillance érosion, fissures"},
+    {id:"deco", label:"Décors et statuaire", sub:"Niches, ornements, fixations"},
+    {id:"signa", label:"Signalétique", sub:"Panneaux de sécurité lisibles"},
+  ]},
+  {id:"entrees", icon:"ti-door-enter", name:"Entrées / Billetterie", desc:"Portails, caisses, sanitaires", checks:[
+    {id:"portails", label:"Portails de sécurité", sub:"Fluidité d'ouverture/fermeture"},
+    {id:"bill", label:"Espace accueil", sub:"Guichets, écrans, matériel"},
+    {id:"wc", label:"Sanitaires publics", sub:"Propreté, consommables, plomberie"},
+  ]},
+  {id:"back", icon:"ti-tools", name:"Loges et Backstage", desc:"Espace artistes, coulisses, technique", checks:[
+    {id:"loges", label:"Loges artistes", sub:"Mobilier, éclairage, propreté"},
+    {id:"coul", label:"Couloirs techniques", sub:"Dégagement, matériel rangé"},
+    {id:"elec", label:"Armoires électriques", sub:"Fermées, accès dégagé"},
+  ]},
+  {id:"ext", icon:"ti-tree", name:"Parvis et Extérieurs", desc:"Sol, PMR, éclairage", checks:[
+    {id:"parvis", label:"État du parvis", sub:"Pavés, dénivelés dangereux"},
+    {id:"pmr", label:"Cheminements PMR", sub:"Rampes, signalisation claire"},
+    {id:"lum", label:"Éclairage public", sub:"Lampadaires, balisage fonctionnel"},
+  ]},
 ];
 
 const ST = [
-  {k:"ras", label:"RAS", icon:"ti-check", cls:"ok"},
-  {k:"passage", label:"Passage demandé", icon:"ti-bell-ringing", cls:"warn"}
+  {k:"ok", label:"RAS", icon:"ti-check", cls:"ok"},
+  {k:"warn", label:"À surveiller", icon:"ti-alert-triangle", cls:"warn"},
+  {k:"bad", label:"Anomalie", icon:"ti-x", cls:"bad"},
 ];
 
-let state = {prenom:"", answers:{}, ts:null};
+let state = {prenom:"", idx:0, answers:{}, ts:null};
 let lastEntries = [];
 let allRondes = [];
 let curYear = "all";
@@ -298,80 +361,65 @@ async function loadAll() {
 }
 
 async function saveRonde(obj) {
-  // RAPPEL : Remplace cette URL par celle de ton Google Apps Script
-  const GOOGLE_SCRIPT_URL = "TON_URL_DE_APPLICATION_WEB_ICI";
-
-  try {
-    // Si tu as configuré le Google Sheet, décommente la ligne ci-dessous :
-    // await fetch(GOOGLE_SCRIPT_URL, { method: "POST", body: JSON.stringify(obj), headers: { "Content-Type": "text/plain;charset=utf-8" }});
-    
-    await storageAdapter.set("ronde3:"+obj.id, JSON.stringify(obj));
-  } catch(e) {
-    console.error(e);
-  }
+  try { await storageAdapter.set("ronde3:"+obj.id, JSON.stringify(obj)); } catch(e){}
 }
 
 function startTour() {
   const p = document.getElementById("prenom").value.trim();
   if(!p) { document.getElementById("prenom").focus(); return; }
-  state = {prenom:p, answers:{}, ts:Date.now()};
-  
-  document.getElementById("tour-user-lbl").textContent = "Agent : " + state.prenom;
-  renderChecklist();
+  state = {prenom:p, idx:0, answers:{}, ts:Date.now()};
+  renderLieu();
   show("s-tour");
 }
 
-function renderChecklist() {
-  const cont = document.getElementById("checklist-cont");
-  cont.innerHTML = "";
+function renderLieu() {
+  const l = LIEUX[state.idx]; const tot = LIEUX.length; const i = state.idx;
+  document.getElementById("tour-user-lbl").textContent = "Inspecteur : " + state.prenom;
+  document.getElementById("step-badge").textContent = (i+1) + " / " + tot;
+  document.getElementById("prog-fill").style.width = Math.round(((i+1)/tot)*100) + "%";
   
-  POINTS_CONTROLE.forEach(p => {
-    const wrap = document.createElement("div");
-    wrap.className = "check-card";
-    
-    // Header
-    const head = document.createElement("div");
-    head.className = "check-header";
-    head.innerHTML = `<div class="check-icon"><i class="ti ${p.icon}"></i></div><div class="check-title">${p.label}</div>`;
-    
-    // Status Buttons
-    const row = document.createElement("div");
-    row.className = "status-btns";
+  document.getElementById("prog-dots").innerHTML = LIEUX.map((_,di) => '<div class="pdot'+(di<i?" done":di===i?" current":"")+'"></div>').join("");
+  document.getElementById("lieu-ic").className = "ti " + l.icon;
+  document.getElementById("lieu-name").textContent = l.name;
+  document.getElementById("lieu-desc").textContent = l.desc;
+  
+  const saved = state.answers[l.id] || {};
+  document.getElementById("note-field").value = saved.note || "";
+  document.getElementById("note-field").oninput = () => {
+    if(!state.answers[l.id]) state.answers[l.id] = {checks:{}};
+    state.answers[l.id].note = document.getElementById("note-field").value;
+  };
+  
+  const cont = document.getElementById("checks-cont"); cont.innerHTML = "";
+  l.checks.forEach(chk => {
+    const sv = (saved.checks||{})[chk.id] || null;
+    const d = document.createElement("div"); d.className = "chk-item";
+    d.innerHTML = '<div class="chk-label">'+chk.label+'</div><div class="chk-sub">'+chk.sub+'</div>';
+    const row = document.createElement("div"); row.className = "status-btns";
     ST.forEach(s => {
       const b = document.createElement("button");
-      b.className = "sbtn";
-      b.innerHTML = `<i class="ti ${s.icon}"></i><span>${s.label}</span>`;
+      b.className = "sbtn" + (sv===s.k ? " " + s.cls : "");
+      b.innerHTML = '<i class="ti '+s.icon+'" aria-hidden="true"></i><span>'+s.label+'</span>';
       b.onclick = () => {
         row.querySelectorAll(".sbtn").forEach(x => x.className = "sbtn");
         b.className = "sbtn " + s.cls;
-        if(!state.answers[p.id]) state.answers[p.id] = {};
-        state.answers[p.id].status = s.k;
+        if(!state.answers[l.id]) state.answers[l.id] = {checks:{}};
+        state.answers[l.id].checks[chk.id] = s.k;
       };
       row.appendChild(b);
     });
-    
-    // Commentaire Libre
-    const noteInp = document.createElement("input");
-    noteInp.type = "text";
-    noteInp.className = "check-note";
-    noteInp.placeholder = "Ajouter une note (ex: Poussières sur les télés)";
-    noteInp.oninput = (e) => {
-      if(!state.answers[p.id]) state.answers[p.id] = {};
-      state.answers[p.id].note = e.target.value;
-    };
-    
-    wrap.appendChild(head);
-    wrap.appendChild(row);
-    wrap.appendChild(noteInp);
-    cont.appendChild(wrap);
+    d.appendChild(row); cont.appendChild(d);
   });
   
-  // Bouton de validation final
-  const btnDiv = document.createElement("div");
-  btnDiv.style = "margin-top: 24px;";
-  btnDiv.innerHTML = `<button class="btn-main" style="padding: 18px;" onclick="finishTour()"><i class="ti ti-send" style="font-size:20px;"></i> Transmettre la ronde</button>`;
-  cont.appendChild(btnDiv);
+  const bp = document.getElementById("btn-prev");
+  bp.style.visibility = i === 0 ? "hidden" : "visible";
+  const bn = document.getElementById("btn-next");
+  if(i === tot-1) { bn.innerHTML = '<i class="ti ti-circle-check" aria-hidden="true"></i> Terminer'; }
+  else { bn.innerHTML = 'Suivant <i class="ti ti-arrow-right" aria-hidden="true"></i>'; }
 }
+
+function nextLieu() { if(state.idx < LIEUX.length-1) { state.idx++; renderLieu(); } else finishTour(); }
+function prevLieu() { if(state.idx > 0) { state.idx--; renderLieu(); } }
 
 async function finishTour() {
   show("s-saving");
@@ -380,15 +428,10 @@ async function finishTour() {
   const year = now.getFullYear().toString();
   let entries = [];
   
-  POINTS_CONTROLE.forEach(p => {
-    const a = state.answers[p.id] || {};
-    entries.push({
-      date: ds, 
-      prenom: state.prenom, 
-      lieu: "Théâtre Antique", // Maintenu pour la compatibilité avec tes colonnes Google Sheets
-      point: p.label, 
-      etat: a.status || "Non vérifié", 
-      note: a.note || ""
+  LIEUX.forEach(lieu => {
+    const a = state.answers[lieu.id] || {};
+    lieu.checks.forEach(chk => {
+      entries.push({date:ds, prenom:state.prenom, lieu:lieu.name, point:chk.label, etat:(a.checks||{})[chk.id]||"non vérifié", note:a.note||""});
     });
   });
   
@@ -396,12 +439,13 @@ async function finishTour() {
   await saveRonde(obj);
   lastEntries = entries;
   
-  let ok=0, warn=0;
-  entries.forEach(e => { if(e.etat==="ras") ok++; else if(e.etat==="passage") warn++; });
+  let ok=0, warn=0, bad=0;
+  entries.forEach(e => { if(e.etat==="ok") ok++; else if(e.etat==="warn") warn++; else if(e.etat==="bad") bad++; });
   
-  setTimeout(() => {
+  setTimeout(() => { // Léger délai pour effet de sauvegarde
     document.getElementById("s-ok").textContent = ok;
     document.getElementById("s-warn").textContent = warn;
+    document.getElementById("s-bad").textContent = bad;
     document.getElementById("done-sub").textContent = ds;
     show("s-done");
   }, 800);
@@ -420,7 +464,7 @@ function buildYearTabs() {
   const years = [...new Set(allRondes.map(r => r.year || new Date(r.ts).getFullYear().toString()))].sort((a,b) => b-a);
   const tabs = document.getElementById("year-tabs");
   if(years.length === 0) { tabs.innerHTML = ""; return; }
-  tabs.innerHTML = '<button class="year-tab active" onclick="setYear(\'all\',this)">Historique complet</button>'
+  tabs.innerHTML = '<button class="year-tab active" onclick="setYear(\'all\',this)">Toutes les archives</button>'
     + years.map(y => '<button class="year-tab" onclick="setYear(\''+y+'\',this)">Année '+y+'</button>').join("");
 }
 
@@ -436,7 +480,7 @@ function renderSuivi() {
   let data = allRondes;
   if(curYear !== "all") data = data.filter(r => (r.year || new Date(r.ts).getFullYear().toString()) === curYear);
   
-  document.getElementById("suivi-sub").textContent = data.length + " contrôle(s) transmis";
+  document.getElementById("suivi-sub").textContent = data.length + " inspection(s)";
   if(!data.length) {
     cont.innerHTML = '<div class="empty-state"><i class="ti ti-database-off" aria-hidden="true"></i><p>Aucune donnée disponible.</p></div>';
     return;
@@ -444,19 +488,20 @@ function renderSuivi() {
   
   cont.innerHTML = "";
   data.forEach((ronde, ri) => {
-    let ok=0, warn=0;
-    ronde.entries.forEach(e => { if(e.etat==="ras") ok++; else if(e.etat==="passage") warn++; });
+    let ok=0, warn=0, bad=0, nv=0;
+    ronde.entries.forEach(e => { if(e.etat==="ok") ok++; else if(e.etat==="warn") warn++; else if(e.etat==="bad") bad++; else nv++; });
     
     const wrap = document.createElement("div"); wrap.className = "ronde-card";
     const head = document.createElement("div"); head.className = "ronde-head";
     
-    const badgesHtml = (warn ? '<span class="badge b-warn"><i class="ti ti-bell-ringing" style="font-size:10px"></i> '+warn+' Demande(s)</span>' : '')
-      + (ok && !warn ? '<span class="badge b-ok"><i class="ti ti-check" style="font-size:10px"></i> 100% RAS</span>' : '');
+    const badgesHtml = (bad ? '<span class="badge b-bad"><i class="ti ti-x" style="font-size:10px"></i> '+bad+' anomalies</span>' : '')
+      + (warn ? '<span class="badge b-warn"><i class="ti ti-alert-triangle" style="font-size:10px"></i> '+warn+' à surveiller</span>' : '')
+      + (ok && !bad && !warn ? '<span class="badge b-ok"><i class="ti ti-check" style="font-size:10px"></i> '+ok+' RAS</span>' : '');
       
     head.innerHTML = '<div class="ronde-av">' + initials(ronde.prenom) + '</div>'
       + '<div style="flex:1;min-width:0;">'
         + '<div class="ronde-name">' + ronde.prenom + '</div>'
-        + '<div class="ronde-date"><i class="ti ti-clock" style="font-size:14px" aria-hidden="true"></i> ' + ronde.date + '</div>'
+        + '<div class="ronde-date"><i class="ti ti-calendar" style="font-size:14px" aria-hidden="true"></i> ' + ronde.date + '</div>'
         + '<div class="badges">' + badgesHtml + '</div>'
       + '</div>'
       + '<i class="ti ti-chevron-down" style="color:#9C8A70; font-size:20px; transition: transform 0.2s;" id="chev-'+ri+'"></i>';
@@ -464,18 +509,19 @@ function renderSuivi() {
     const detail = document.createElement("div"); detail.className = "ronde-detail";
     
     let rows = ronde.entries.map(e => {
-      const bc = e.etat==="ras" ? "b-ok" : e.etat==="passage" ? "b-warn" : "";
-      const bl = e.etat==="ras" ? "RAS" : e.etat==="passage" ? "Passage demandé" : "Ignoré";
+      const bc = e.etat==="ok" ? "b-ok" : e.etat==="warn" ? "b-warn" : e.etat==="bad" ? "b-bad" : "";
+      const bl = e.etat==="ok" ? "RAS" : e.etat==="warn" ? "À surveiller" : e.etat==="bad" ? "Anomalie" : "Non vérifié";
       return '<div class="detail-item">'
         + '<div class="detail-left">'
+        + '<div class="detail-lieu">' + e.lieu + '</div>'
         + '<div class="detail-point">' + e.point + '</div>'
-        + (e.note ? '<div class="detail-note"><i class="ti ti-messages" style="color:#C4A882; font-size:16px;"></i><span style="flex:1">' + e.note + '</span></div>' : '')
+        + (e.note ? '<div class="detail-note"><i class="ti ti-info-circle" style="font-size:13px; vertical-align:middle; margin-right:4px;"></i>' + e.note + '</div>' : '')
         + '</div>'
-        + '<span class="badge ' + bc + '" style="margin-left:8px; flex-shrink:0;">' + bl + '</span>'
+        + '<span class="badge ' + bc + '">' + bl + '</span>'
         + '</div>';
     }).join("");
     
-    detail.innerHTML = rows;
+    detail.innerHTML = rows + '<div style="padding:16px; text-align:center;"><button class="btn-outline" style="padding:10px; width:100%; font-size:13px;" onclick="exportExcel(allRondes['+ri+'].entries)"><i class="ti ti-download"></i> Exporter ce rapport</button></div>';
     
     head.onclick = () => {
       const open = detail.classList.toggle("open");
@@ -486,9 +532,9 @@ function renderSuivi() {
 }
 
 function buildData(entries) {
-  const rows = [["Date et Heure", "Agent", "Zone", "Point de contrôle", "État", "Observations"]];
+  const rows = [["Date et Heure", "Agent", "Lieu", "Contrôle", "État", "Observations"]];
   entries.forEach(e => {
-    const l = e.etat==="ras" ? "RAS" : e.etat==="passage" ? "Passage demandé" : "Non vérifié";
+    const l = e.etat==="ok" ? "RAS" : e.etat==="warn" ? "À surveiller" : e.etat==="bad" ? "Anomalie" : "Non vérifié";
     rows.push([e.date, e.prenom, e.lieu, e.point, l, e.note]);
   });
   return rows;
@@ -498,9 +544,9 @@ function exportExcel(entries) {
   if(!entries || !entries.length) return;
   const wb = XLSX.utils.book_new();
   const ws = XLSX.utils.aoa_to_sheet(buildData(entries));
-  ws["!cols"] = [{wch:18}, {wch:14}, {wch:25}, {wch:28}, {wch:18}, {wch:40}];
+  ws["!cols"] = [{wch:18}, {wch:14}, {wch:25}, {wch:28}, {wch:14}, {wch:40}];
   XLSX.utils.book_append_sheet(wb, ws, "Rapport");
-  XLSX.writeFile(wb, "Controle_Theatre_" + (entries[0]?.date||"").replace(/[\/ :]/g,"-") + ".xlsx");
+  XLSX.writeFile(wb, "Ronde_Theatre_Orange_" + (entries[0]?.date||"").replace(/[\/ :]/g,"-") + ".xlsx");
 }
 
 async function exportAllExcel() {
@@ -511,10 +557,10 @@ async function exportAllExcel() {
   if(!all.length) return;
   const wb = XLSX.utils.book_new();
   const ws = XLSX.utils.aoa_to_sheet(buildData(all));
-  ws["!cols"] = [{wch:18}, {wch:14}, {wch:25}, {wch:28}, {wch:18}, {wch:40}];
+  ws["!cols"] = [{wch:18}, {wch:14}, {wch:25}, {wch:28}, {wch:14}, {wch:40}];
   const label = curYear === "all" ? "Globale" : curYear;
   XLSX.utils.book_append_sheet(wb, ws, "Historique");
-  XLSX.writeFile(wb, "Historique_Controles_" + label + "_" + new Date().toISOString().slice(0,10) + ".xlsx");
+  XLSX.writeFile(wb, "Historique_Rondes_Orange_" + label + "_" + new Date().toISOString().slice(0,10) + ".xlsx");
 }
 
 function resetTour() { document.getElementById("prenom").value = ""; show("s-welcome"); }
