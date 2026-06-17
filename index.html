@@ -291,24 +291,33 @@ async function loadAll() {
   } catch(e) { allRondes = []; }
 }
 
-async function saveRonde(obj) {
-  // Ton URL Google Apps Script officielle
+async function loadAll() {
   const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxaVsNFhFjnuYO5zxooqGThKiEm_bRlIcB78gY0D22ubrLOnzzCpKJAX15h44hjymSG/exec";
-
+  
   try {
-    // 1. Envoi silencieux des données vers ton Google Sheets (et Teams !)
-    await fetch(GOOGLE_SCRIPT_URL, { 
-      method: "POST", 
-      body: JSON.stringify(obj), 
-      headers: { "Content-Type": "text/plain;charset=utf-8" }
-    });
+    // On essaie de télécharger la base globale depuis Google Sheets
+    const response = await fetch(GOOGLE_SCRIPT_URL);
+    const data = await response.json();
     
-    // 2. Sauvegarde en local pour l'historique sur le téléphone de l'agent
-    await storageAdapter.set("ronde3:"+obj.id, JSON.stringify(obj));
-    
+    if (Array.isArray(data)) {
+      allRondes = data;
+      // On trie pour avoir les rondes les plus récentes en haut
+      allRondes.sort((a,b) => b.ts - a.ts); 
+    } else {
+      allRondes = [];
+    }
   } catch(e) {
-    console.error("Erreur de sauvegarde", e);
-    alert("Le rapport est sauvegardé sur ce téléphone, mais la transmission au serveur a échoué. Vérifiez la connexion.");
+    console.error("Le rapport est sauvegardé sur ce téléphone, mais la transmission au serveur a échoué. Vérifiez la connexion.", e);
+    // Secours : si pas de réseau, on charge la mémoire locale du téléphone
+    try {
+      const res = await storageAdapter.list("ronde3:");
+      const keys = res.keys || [];
+      allRondes = [];
+      for(const k of keys) {
+        try { const r = await storageAdapter.get(k); if(r && r.value) allRondes.push(JSON.parse(r.value)); } catch(err){}
+      }
+      allRondes.sort((a,b) => b.ts - a.ts);
+    } catch(err) { allRondes = []; }
   }
 }
 
