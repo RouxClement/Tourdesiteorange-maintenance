@@ -228,7 +228,10 @@
 </div>
 
 <script>
-// LocalStorage simulant la base
+// Le lien global pour la Base de Données
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxaVsNFhFjnuYO5zxooqGThKiEm_bRlIcB78gY0D22ubrLOnzzCpKJAX15h44hjymSG/exec";
+
+// LocalStorage simulant la base locale de secours
 const storageAdapter = {
   async list(prefix) {
     const keys = [];
@@ -279,36 +282,20 @@ function initials(n) {
   return (n||"?").split(" ").map(w=>w[0]).join("").toUpperCase().slice(0,2);
 }
 
+// Fonction pour LIRE le tableau Sheets (avec mode secours local)
 async function loadAll() {
   try {
-    const res = await storageAdapter.list("ronde3:");
-    const keys = res.keys || [];
-    allRondes = [];
-    for(const k of keys) {
-      try { const r = await storageAdapter.get(k); if(r && r.value) allRondes.push(JSON.parse(r.value)); } catch(e){}
-    }
-    allRondes.sort((a,b) => b.ts - a.ts);
-  } catch(e) { allRondes = []; }
-}
-
-async function loadAll() {
-  const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxaVsNFhFjnuYO5zxooqGThKiEm_bRlIcB78gY0D22ubrLOnzzCpKJAX15h44hjymSG/exec";
-  
-  try {
-    // On essaie de télécharger la base globale depuis Google Sheets
     const response = await fetch(GOOGLE_SCRIPT_URL);
     const data = await response.json();
     
     if (Array.isArray(data)) {
       allRondes = data;
-      // On trie pour avoir les rondes les plus récentes en haut
       allRondes.sort((a,b) => b.ts - a.ts); 
     } else {
       allRondes = [];
     }
   } catch(e) {
-    console.error("Le rapport est sauvegardé sur ce téléphone, mais la transmission au serveur a échoué. Vérifiez la connexion.", e);
-    // Secours : si pas de réseau, on charge la mémoire locale du téléphone
+    console.error("Erreur de connexion au serveur, chargement de l'historique local", e);
     try {
       const res = await storageAdapter.list("ronde3:");
       const keys = res.keys || [];
@@ -318,6 +305,26 @@ async function loadAll() {
       }
       allRondes.sort((a,b) => b.ts - a.ts);
     } catch(err) { allRondes = []; }
+  }
+}
+
+// Fonction pour ENVOYER les données vers Google Sheets
+async function saveRonde(obj) {
+  try {
+    // Envoi silencieux grâce au mode "no-cors"
+    await fetch(GOOGLE_SCRIPT_URL, { 
+      method: "POST", 
+      mode: "no-cors",
+      body: JSON.stringify(obj), 
+      headers: { "Content-Type": "text/plain;charset=utf-8" }
+    });
+    
+    // On sauvegarde aussi dans le téléphone pour la sécurité
+    await storageAdapter.set("ronde3:"+obj.id, JSON.stringify(obj));
+    
+  } catch(e) {
+    console.error("Erreur de sauvegarde", e);
+    alert("Le rapport est sauvegardé sur ce téléphone, mais la transmission au serveur a échoué. Vérifiez la connexion internet.");
   }
 }
 
@@ -339,12 +346,10 @@ function renderChecklist() {
     const wrap = document.createElement("div");
     wrap.className = "check-card";
     
-    // Header
     const head = document.createElement("div");
     head.className = "check-header";
     head.innerHTML = `<div class="check-icon"><i class="ti ${p.icon}"></i></div><div class="check-title">${p.label}</div>`;
     
-    // Status Buttons
     const row = document.createElement("div");
     row.className = "status-btns";
     ST.forEach(s => {
@@ -360,7 +365,6 @@ function renderChecklist() {
       row.appendChild(b);
     });
     
-    // Commentaire Libre
     const noteInp = document.createElement("input");
     noteInp.type = "text";
     noteInp.className = "check-note";
@@ -376,7 +380,6 @@ function renderChecklist() {
     cont.appendChild(wrap);
   });
   
-  // Bouton de validation final
   const btnDiv = document.createElement("div");
   btnDiv.style = "margin-top: 24px;";
   btnDiv.innerHTML = `<button class="btn-main" style="padding: 18px;" onclick="finishTour()"><i class="ti ti-send" style="font-size:20px;"></i> Transmettre la ronde</button>`;
@@ -395,7 +398,7 @@ async function finishTour() {
     entries.push({
       date: ds, 
       prenom: state.prenom, 
-      lieu: "Théâtre Antique", // Maintenu pour la compatibilité avec tes colonnes Google Sheets
+      lieu: "Théâtre Antique", 
       point: p.label, 
       etat: a.status || "Non vérifié", 
       note: a.note || ""
