@@ -4,6 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Ronde de Site - Théâtre Antique</title>
+  
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏛️</text></svg>">
+  
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -332,24 +335,25 @@ async function saveRonde(obj) {
 }
 
 // ==========================================
-// NOUVEAUTÉ : MARQUER COMME FAIT (RÉSEAU)
+// MARQUER COMME FAIT (RÉSEAU)
 // ==========================================
 async function marquerFaitEnReseau(rondeId, pointIndex) {
-  if (!confirm("Marquer cette tâche comme FAITE et mettre à jour le fichier Excel en réseau ?")) return;
+  if (!confirm("Marquer cette tâche comme FAITE ?")) return;
   
   const ronde = allRondes.find(r => r.id === rondeId);
   if (!ronde) return;
   
   const entree = ronde.entries[pointIndex];
-  // On ajoute la date de réparation à la note existante
-  const suffixe = "(Réparé le " + new Date().toLocaleDateString("fr-FR") + ")";
-  const nouvelleNote = entree.note ? entree.note + " - " + suffixe : suffixe;
+  
+  // On ajoute simplement "- Fait"
+  const suffixe = "- Fait";
+  const nouvelleNote = entree.note ? entree.note + " " + suffixe : suffixe;
   
   try {
     // On envoie la mise à jour à Google Sheets
     await fetch(GOOGLE_SCRIPT_URL, {
       method: "POST",
-      mode: "no-cors", // On garde no-cors pour correspondre à ton système actuel
+      mode: "no-cors", 
       body: JSON.stringify({
         action: "update",
         date: ronde.date,
@@ -365,8 +369,8 @@ async function marquerFaitEnReseau(rondeId, pointIndex) {
     entree.note = nouvelleNote;
     await storageAdapter.set("ronde3:" + ronde.id, JSON.stringify(ronde));
     
+    // On recharge l'historique (sans afficher de pop-up d'alerte cette fois)
     renderSuivi(); 
-    alert("Tâche marquée comme FAITE et Excel mis à jour !");
     
   } catch (error) {
     alert("Erreur réseau. Impossible de joindre Excel (Vérifie ta connexion internet).");
@@ -563,7 +567,6 @@ function renderSuivi() {
       const bc = e.etat==="ras" ? "b-ok" : e.etat==="passage" ? "b-warn" : "";
       const bl = e.etat==="ras" ? "RAS" : e.etat==="passage" ? "Passage demandé" : "Ignoré";
       
-      // AJOUT DU BOUTON MARQUER FAIT ICI
       let actionBtn = "";
       if(e.etat === "passage") {
         actionBtn = `<button class="btn-done-task" onclick="marquerFaitEnReseau('${ronde.id}', ${idx})">
