@@ -116,7 +116,7 @@
 
     /* Listes & Historique */
     .suivi-body { padding: 16px 20px 30px; background: var(--bg-color); flex: 1; overflow-y: auto;}
-    .year-tabs { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 16px; scrollbar-width: none; }
+    .year-tabs { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 8px; scrollbar-width: none; }
     .year-tabs::-webkit-scrollbar { display: none; }
     .year-tab { padding: 10px 20px; border-radius: 24px; border: 1px solid #DDD5C5; background: var(--app-bg); font-size: 14px; font-weight: 600; color: var(--text-muted); cursor: pointer; white-space: nowrap; transition: all 0.2s;}
     .year-tab.active { background: var(--primary); color: #F5EFE6; border-color: var(--primary); }
@@ -221,6 +221,7 @@
     </div>
     <div class="suivi-body">
       <div class="year-tabs" id="year-tabs"></div>
+      <div class="year-tabs" id="month-tabs" style="margin-bottom: 16px;"></div>
       <div id="rondes-list"></div>
     </div>
   </div>
@@ -272,6 +273,7 @@ let state = {prenom:"", answers:{}, ts:null};
 let lastEntries = [];
 let allRondes = [];
 let curYear = "all";
+let curMonth = "all"; // Variable pour le filtre du mois
 
 function show(id) {
   document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
@@ -282,7 +284,7 @@ function initials(n) {
   return (n||"?").split(" ").map(w=>w[0]).join("").toUpperCase().slice(0,2);
 }
 
-// Fonction pour LIRE le tableau Sheets (avec mode secours local)
+// Fonction pour LIRE le tableau Sheets
 async function loadAll() {
   try {
     const response = await fetch(GOOGLE_SCRIPT_URL);
@@ -295,7 +297,7 @@ async function loadAll() {
       allRondes = [];
     }
   } catch(e) {
-    console.error("Erreur de connexion au serveur, chargement de l'historique local", e);
+    console.error("Erreur de connexion au serveur", e);
     try {
       const res = await storageAdapter.list("ronde3:");
       const keys = res.keys || [];
@@ -311,17 +313,13 @@ async function loadAll() {
 // Fonction pour ENVOYER les données vers Google Sheets
 async function saveRonde(obj) {
   try {
-    // Envoi silencieux grâce au mode "no-cors"
     await fetch(GOOGLE_SCRIPT_URL, { 
       method: "POST", 
       mode: "no-cors",
       body: JSON.stringify(obj), 
       headers: { "Content-Type": "text/plain;charset=utf-8" }
     });
-    
-    // On sauvegarde aussi dans le téléphone pour la sécurité
     await storageAdapter.set("ronde3:"+obj.id, JSON.stringify(obj));
-    
   } catch(e) {
     console.error("Erreur de sauvegarde", e);
     alert("Le rapport est sauvegardé sur ce téléphone, mais la transmission au serveur a échoué. Vérifiez la connexion internet.");
@@ -400,6 +398,7 @@ async function finishTour() {
       prenom: state.prenom, 
       lieu: "Théâtre Antique", 
       point: p.label, 
+      grid_id: p.id,
       etat: a.status || "Non vérifié", 
       note: a.note || ""
     });
@@ -423,9 +422,11 @@ async function finishTour() {
 async function openSuivi() {
   show("s-suivi");
   curYear = "all";
+  curMonth = "all"; // Remise à zéro au chargement
   document.getElementById("rondes-list").innerHTML = '<div class="empty-state"><i class="ti ti-loader" style="animation: spin 1s linear infinite" aria-hidden="true"></i><p>Chargement…</p></div>';
   await loadAll();
   buildYearTabs();
+  buildMonthTabs();
   renderSuivi();
 }
 
@@ -433,13 +434,39 @@ function buildYearTabs() {
   const years = [...new Set(allRondes.map(r => r.year || new Date(r.ts).getFullYear().toString()))].sort((a,b) => b-a);
   const tabs = document.getElementById("year-tabs");
   if(years.length === 0) { tabs.innerHTML = ""; return; }
-  tabs.innerHTML = '<button class="year-tab active" onclick="setYear(\'all\',this)">Historique complet</button>'
-    + years.map(y => '<button class="year-tab" onclick="setYear(\''+y+'\',this)">Année '+y+'</button>').join("");
+  tabs.innerHTML = '<button class="year-tab active" onclick="setYear(\'all\',this)">Toutes les années</button>'
+    + years.map(y => '<button class="year-tab" onclick="setYear(\''+y+'\',this)">'+y+'</button>').join("");
+}
+
+// Nouvelle barre pour filtrer par mois
+function buildMonthTabs() {
+  const tabs = document.getElementById("month-tabs");
+  if (!tabs) return;
+  
+  const moisKeys = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"];
+  const moisNoms = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"];
+  
+  let html = `<button class="year-tab ${curMonth === 'all' ? 'active' : ''}" onclick="setMonth('all', this)">Tous les mois</button>`;
+  
+  moisKeys.forEach((k, idx) => {
+    html += `<button class="year-tab ${curMonth === k ? 'active' : ''}" onclick="setMonth('${k}', this)">${moisNoms[idx]}</button>`;
+  });
+  
+  tabs.innerHTML = html;
 }
 
 function setYear(y, btn) {
   curYear = y;
-  document.querySelectorAll(".year-tab").forEach(b => b.classList.remove("active"));
+  curMonth = "all"; // On réinitialise le mois choisi pour éviter les listes vides
+  document.querySelectorAll("#year-tabs .year-tab").forEach(b => b.classList.remove("active"));
+  btn.classList.add("active");
+  buildMonthTabs(); // On rafraîchit l'affichage des mois
+  renderSuivi();
+}
+
+function setMonth(m, btn) {
+  curMonth = m;
+  document.querySelectorAll("#month-tabs .year-tab").forEach(b => b.classList.remove("active"));
   btn.classList.add("active");
   renderSuivi();
 }
@@ -447,11 +474,21 @@ function setYear(y, btn) {
 function renderSuivi() {
   const cont = document.getElementById("rondes-list");
   let data = allRondes;
+  
+  // 1. Filtrage par année
   if(curYear !== "all") data = data.filter(r => (r.year || new Date(r.ts).getFullYear().toString()) === curYear);
   
-  document.getElementById("suivi-sub").textContent = data.length + " contrôle(s) transmis";
+  // 2. Filtrage par mois (recherche le morceau /MM/ dans la date de l'appli)
+  if(curMonth !== "all") {
+    data = data.filter(r => {
+      const match = r.date.match(/le \d{2}\/(\d{2})\//);
+      return match && match[1] === curMonth;
+    });
+  }
+  
+  document.getElementById("suivi-sub").textContent = data.length + " contrôle(s) affiché(s)";
   if(!data.length) {
-    cont.innerHTML = '<div class="empty-state"><i class="ti ti-database-off" aria-hidden="true"></i><p>Aucune donnée disponible.</p></div>';
+    cont.innerHTML = '<div class="empty-state"><i class="ti ti-filter-off" aria-hidden="true"></i><p>Aucun rapport trouvé pour cette sélection.</p></div>';
     return;
   }
   
@@ -519,15 +556,28 @@ function exportExcel(entries) {
 async function exportAllExcel() {
   if(!allRondes.length) return;
   let data = allRondes;
+  
   if(curYear !== "all") data = data.filter(r => (r.year || new Date(r.ts).getFullYear().toString()) === curYear);
+  if(curMonth !== "all") {
+    data = data.filter(r => {
+      const match = r.date.match(/le \d{2}\/(\d{2})\//);
+      return match && match[1] === curMonth;
+    });
+  }
+  
   const all = data.flatMap(r => r.entries);
   if(!all.length) return;
+  
   const wb = XLSX.utils.book_new();
   const ws = XLSX.utils.aoa_to_sheet(buildData(all));
   ws["!cols"] = [{wch:18}, {wch:14}, {wch:25}, {wch:28}, {wch:18}, {wch:40}];
-  const label = curYear === "all" ? "Globale" : curYear;
+  
+  const labelAnnee = curYear === "all" ? "Global" : curYear;
+  const moisNoms = {"01":"Janvier","02":"Fevrier","03":"Mars","04":"Avril","05":"Mai","06":"Juin","07":"Juillet","08":"Aout","09":"Septembre","10":"Octobre","11":"Novembre","12":"Decembre"};
+  const labelMois = curMonth === "all" ? "" : "_" + moisNoms[curMonth];
+  
   XLSX.utils.book_append_sheet(wb, ws, "Historique");
-  XLSX.writeFile(wb, "Historique_Controles_" + label + "_" + new Date().toISOString().slice(0,10) + ".xlsx");
+  XLSX.writeFile(wb, "Historique_Controles_" + labelAnnee + labelMois + "_" + new Date().toISOString().slice(0,10) + ".xlsx");
 }
 
 function resetTour() { document.getElementById("prenom").value = ""; show("s-welcome"); }
