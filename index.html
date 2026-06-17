@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Ronde de Site - Théâtre Antique</title>
   
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🏛️%3C/text%3E%3C/svg%3E">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏛️</text></svg>">
   
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
@@ -369,11 +369,11 @@ async function marquerFaitEnReseau(rondeId, pointIndex) {
     entree.note = nouvelleNote;
     await storageAdapter.set("ronde3:" + ronde.id, JSON.stringify(ronde));
     
-    // On recharge l'historique de manière invisible
+    // On recharge l'historique (sans afficher de pop-up d'alerte cette fois)
     renderSuivi(); 
     
   } catch (error) {
-    alert("Erreur réseau. Impossible de joindre Excel (Vérifiez votre connexion internet).");
+    alert("Erreur réseau. Impossible de joindre Excel (Vérifie ta connexion internet).");
   }
 }
 
@@ -525,12 +525,13 @@ function renderSuivi() {
   const cont = document.getElementById("rondes-list");
   let data = allRondes;
   
+  // 1. Filtrage par année
   if(curYear !== "all") data = data.filter(r => (r.year || new Date(r.ts).getFullYear().toString()) === curYear);
   
+  // 2. Filtrage par mois (Corrigé pour correspondre au bon format "17/06/2026")
   if(curMonth !== "all") {
     data = data.filter(r => {
-      // Vérifie que la date contient /le mois/ (ex: le 17/06/2026)
-      const match = r.date.match(/le \d{2}\/(\d{2})\/\d{4}/);
+      const match = r.date.match(/^\d{2}\/(\d{2})\/\d{4}/);
       return match && match[1] === curMonth;
     });
   }
@@ -620,7 +621,7 @@ async function exportAllExcel() {
   if(curYear !== "all") data = data.filter(r => (r.year || new Date(r.ts).getFullYear().toString()) === curYear);
   if(curMonth !== "all") {
     data = data.filter(r => {
-      const match = r.date.match(/le \d{2}\/(\d{2})\/\d{4}/);
+      const match = r.date.match(/^\d{2}\/(\d{2})\/\d{4}/);
       return match && match[1] === curMonth;
     });
   }
