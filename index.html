@@ -142,7 +142,7 @@
     .detail-point { font-size: 14px; color: var(--text-main); font-weight: 600; }
     .detail-note { font-size: 13px; color: #1A1410; margin-top: 6px; background: #FFFFFF; padding: 8px 10px; border-radius: 6px; border: 1px solid #E8E0D4; display: flex; gap: 6px; align-items: flex-start;}
 
-    /* Bouton  Fait */
+    /* Bouton Fait */
     .btn-done-task { margin-top: 4px; padding: 8px 12px; border: none; border-radius: 8px; background: #EAF5EE; color: #1A6B3C; font-weight: 600; font-size: 12px; cursor: pointer; border: 1px solid #A3D4B5; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s; font-family: inherit; }
     .btn-done-task:active { transform: scale(0.96); background: #D1E8DB; }
 
@@ -237,7 +237,7 @@
 </div>
 
 <script>
-// Le lien global pour la Base de Données
+// Ton lien serveur (Mis à jour à l'identique de ton ancien code)
 const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbysQn82w88rY0udaONqN2a6DsQBAO9was2HkB5zKTAwglVUg0MP9wphEwA_ox7lie4/exec";
 
 // LocalStorage simulant la base locale de secours
@@ -350,7 +350,6 @@ async function marquerFaitEnReseau(rondeId, pointIndex) {
   const nouvelleNote = entree.note ? entree.note + " " + suffixe : suffixe;
   
   try {
-    // On envoie la mise à jour à Google Sheets
     await fetch(GOOGLE_SCRIPT_URL, {
       method: "POST",
       mode: "no-cors", 
@@ -364,16 +363,14 @@ async function marquerFaitEnReseau(rondeId, pointIndex) {
       headers: { "Content-Type": "text/plain;charset=utf-8" }
     });
     
-    // On met à jour l'affichage sur le téléphone tout de suite
     entree.etat = "ras";
     entree.note = nouvelleNote;
     await storageAdapter.set("ronde3:" + ronde.id, JSON.stringify(ronde));
     
-    // On recharge l'historique (sans afficher de pop-up d'alerte cette fois)
     renderSuivi(); 
     
   } catch (error) {
-    alert("Erreur réseau. Impossible de joindre Excel (Vérifie ta connexion internet).");
+    alert("Erreur réseau. Impossible de joindre la base (Vérifie ta connexion internet).");
   }
 }
 
@@ -525,13 +522,13 @@ function renderSuivi() {
   const cont = document.getElementById("rondes-list");
   let data = allRondes;
   
-  // 1. Filtrage par année
+  // Filtrage par année
   if(curYear !== "all") data = data.filter(r => (r.year || new Date(r.ts).getFullYear().toString()) === curYear);
   
-  // 2. Filtrage par mois (Corrigé pour correspondre au bon format "17/06/2026")
+  // Filtrage par mois (La fameuse correction du bug des dates)
   if(curMonth !== "all") {
     data = data.filter(r => {
-      const match = r.date.match(/^\d{2}\/(\d{2})\/\d{4}/);
+      const match = r.date.match(/\/(\d{2})\/\d{4}/);
       return match && match[1] === curMonth;
     });
   }
@@ -621,7 +618,7 @@ async function exportAllExcel() {
   if(curYear !== "all") data = data.filter(r => (r.year || new Date(r.ts).getFullYear().toString()) === curYear);
   if(curMonth !== "all") {
     data = data.filter(r => {
-      const match = r.date.match(/^\d{2}\/(\d{2})\/\d{4}/);
+      const match = r.date.match(/\/(\d{2})\/\d{4}/);
       return match && match[1] === curMonth;
     });
   }
